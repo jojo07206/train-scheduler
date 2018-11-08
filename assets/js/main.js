@@ -13,6 +13,7 @@ $(function(){
   var TrainName = "";
   var Destination = "";
   var Frequency = 0;
+  var currenttime = moment().format('LT');
 
   $("#run").on("click",function(e){
     e.preventDefault();
@@ -22,24 +23,35 @@ $(function(){
 
     var FirstTrainTime = $("#FirstTrainTime").val().trim();
     var traintime = moment(FirstTrainTime, "hmm").format("HH:mm");
-    var nextarrivaltime = "";
 
-    if((moment().format('LT')) == traintime) {
-       nextarrivaltime = moment().add(Frequency, 'minutes');
-    } else if ((moment().format('LT')) != traintime) {
-       nextarrivaltime = moment().add(0, 'minutes');
+    if(currenttime == traintime) {
+
+       traintime = moment(traintime).add(Frequency, 'minutes');
+       var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
+
+       firebase.database().ref().push({
+        TrainName:TrainName,
+        Destination:Destination,
+        NextArrival:traintime,
+        Frequency:Frequency, 
+        minutesaway:minutesaway,
+        dateAdded: firebase.database.ServerValue.TIMESTAMP
+      });
+
+    } else if (currenttime != traintime) {
+       traintime = moment(traintime).add(0, 'minutes');
+       var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
+
+       firebase.database().ref().push({
+        TrainName:TrainName,
+        Destination:Destination,
+        NextArrival:traintime,
+        Frequency:Frequency, 
+        minutesaway:minutesaway,
+        dateAdded: firebase.database.ServerValue.TIMESTAMP
+      });
+
     };
-
-    // var minutesaway = 
-
-  firebase.database().ref().push({
-    TrainName:TrainName,
-    Destination:Destination,
-    NextArrival:nextarrivaltime,
-    Frequency:Frequency, 
-    // minutesaway:minutesaway,
-    dateAdded: firebase.database.ServerValue.TIMESTAMP
-  });
 });
 
 firebase.database().ref().on("child_added",function(snapshot){
@@ -49,7 +61,7 @@ firebase.database().ref().on("child_added",function(snapshot){
   $(row).append("<td>"+snapshot.val().TrainName+"</td>");
   $(row).append("<td>"+snapshot.val().Destination+"</td>");
   $(row).append("<td>"+snapshot.val().Frequency+"</td>");
-  $(row).append("<td>"+snapshot.val().NextArrival+"</td>");
+  $(row).append("<td>"+snapshot.val().traintime+"</td>");
   $(row).append("<td>"+snapshot.val().minutesaway+"</td>");
 
   $("#TrainScheduler").append(row);
