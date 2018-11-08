@@ -38,9 +38,15 @@ firebase.database().ref().on("child_added",function(snapshot){
   
   $(row).append("<td>"+snapshot.val().TrainName+"</td>");
   $(row).append("<td>"+snapshot.val().Destination+"</td>");
-  $(row).append("<td>"+snapshot.val().FirstTrainTime+"</td>");
   $(row).append("<td>"+snapshot.val().Frequency+"</td>");
+  $(row).append("<td>"+snapshot.val().FirstTrainTime+"</td>");
+
   $("#TrainScheduler").append(row);
   
 });
 });
+
+
+
+// minutes away is arrival time minus current time in minutes
+//next arrival is 
