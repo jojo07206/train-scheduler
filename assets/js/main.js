@@ -14,6 +14,7 @@ $(function(){
   var Destination = "";
   var Frequency = 0;
   var currenttime = moment().format('LT');
+  var traintime = "";
 
   $("#run").on("click",function(e){
     e.preventDefault();
@@ -23,36 +24,46 @@ $(function(){
 
     var FirstTrainTime = $("#FirstTrainTime").val().trim();
     var traintime = moment(FirstTrainTime, "hmm").format("HH:mm");
+    var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
 
-    if(currenttime == traintime) {
-
-       traintime = moment(traintime).add(Frequency, 'minutes');
-       var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
-
-       firebase.database().ref().push({
-        TrainName:TrainName,
-        Destination:Destination,
-        NextArrival:traintime,
-        Frequency:Frequency, 
-        minutesaway:minutesaway,
-        dateAdded: firebase.database.ServerValue.TIMESTAMP
-      });
-
-    } else if (currenttime != traintime) {
-       traintime = moment(traintime).add(0, 'minutes');
-       var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
-
-       firebase.database().ref().push({
-        TrainName:TrainName,
-        Destination:Destination,
-        NextArrival:traintime,
-        Frequency:Frequency, 
-        minutesaway:minutesaway,
-        dateAdded: firebase.database.ServerValue.TIMESTAMP
-      });
-
-    };
+    firebase.database().ref().push({
+      TrainName:TrainName,
+      Destination:Destination,
+      NextArrival:traintime,
+      Frequency:Frequency, 
+      minutesaway:minutesaway,
+      dateAdded: firebase.database.ServerValue.TIMESTAMP
+    });
 });
+
+if(currenttime == traintime) {
+
+  traintime = moment(traintime).add(Frequency, 'minutes');
+  var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
+
+  firebase.database().ref().update({
+   TrainName:TrainName,
+   Destination:Destination,
+   NextArrival:traintime,
+   Frequency:Frequency, 
+   minutesaway:minutesaway,
+   dateAdded: firebase.database.ServerValue.TIMESTAMP
+ });
+
+} else if (currenttime != traintime) {
+  traintime = moment(traintime).add(0, 'minutes');
+  var minutesaway = moment(traintime).subtract(currenttime, 'minutes');
+
+  firebase.database().ref().update({
+   TrainName:TrainName,
+   Destination:Destination,
+   NextArrival:traintime,
+   Frequency:Frequency, 
+   minutesaway:minutesaway,
+   dateAdded: firebase.database.ServerValue.TIMESTAMP
+ });
+
+};
 
 firebase.database().ref().on("child_added",function(snapshot){
 
