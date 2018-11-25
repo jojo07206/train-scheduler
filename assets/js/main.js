@@ -13,8 +13,7 @@ $(function(){
   var TrainName = "";
   var Destination = "";
   var Frequency = 0;
-  var currenttime = moment().format('H:m');
-  var traintime = "";
+  var currenttime = moment();
 
   $("#run").on("click",function(e){
     e.preventDefault();
@@ -23,19 +22,21 @@ $(function(){
     Frequency = $("#Frequency").val().trim();
 
     var FirstTrainTime = $("#FirstTrainTime").val().trim();
-    var traintime = moment(FirstTrainTime, "hmm").format("H:m");
-    // var minutesaway = traintime.diff(currenttime, "minutes");
+    var appendtraintime = moment(FirstTrainTime, "hmm").format("H:m");
 
-console.log(traintime);
-console.log(currenttime);
-// console.log(minutesaway);
+    var traintime = moment(FirstTrainTime, "hmm");
+    var minutesaway = traintime.diff(currenttime, "minutes");
+
+console.log("traintime: " + traintime);
+console.log("currenttime: " + currenttime);
+console.log("minuteaway: " + minutesaway);
 
     firebase.database().ref().push({
       TrainName:TrainName,
       Destination:Destination,
-      NextArrival:traintime,
+      NextArrival:appendtraintime,
       Frequency:Frequency, 
-      // minutesaway:minutesaway,
+      minutesaway:minutesaway,
       dateAdded: firebase.database.ServerValue.TIMESTAMP
     });
 });
